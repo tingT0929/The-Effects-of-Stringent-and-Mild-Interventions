@@ -111,3 +111,82 @@ placebo.shanghai2 <- placebo.shanghai2[!placebo.shanghai2$area %in% thstimes.sha
 placebo.shanghai2$group <- factor(c(rep("shanghai",16), rep("Control Regions", 
                                                             (index.placebo.shanghai-1-length(thstimes.shanghai))*16)),
                                   levels = c("shanghai", "Control Regions"))
+
+
+# ------------------------- Combine 2 cities ----------------------------
+line.shanghai[line.shanghai$index == "Shanghai", "index"] <- "Observed"
+line.shanghai$city <- "Shanghai"
+line.wenzhou$index <- as.character(line.wenzhou$index)
+line.wenzhou[line.wenzhou$index == "Wenzhou", "index"] <- "Observed"
+line.wenzhou$city <- "Wenzhou"
+
+placebo.shanghai2$group <- as.character(placebo.shanghai2$group)
+placebo.shanghai2[placebo.shanghai2$group == "shanghai", "group"] <- "Treated Region"
+placebo.shanghai2$city <- "Shanghai"
+placebo.wenzhou2$group <- as.character(placebo.wenzhou2$group)
+placebo.wenzhou2[placebo.wenzhou2$group == "wenzhou", "group"] <- "Treated Region"
+placebo.wenzhou2$city <- "Wenzhou"
+
+line_2city <- rbind(line.shanghai, line.wenzhou)
+placebo_2city <- rbind(placebo.shanghai2, placebo.wenzhou2)
+
+line_2city$city <- factor(line_2city$city, levels = c("Wenzhou", "Shanghai"))
+placebo_2city$city <- factor(placebo_2city$city, levels = c("Wenzhou", "Shanghai"))
+
+placebo_2city$group <- factor(placebo_2city$group, levels = c("Treated Region", "Control Regions"))
+
+line_2city$policy_date <- as.Date("2020-01-24")
+line_2city[line_2city$city == "Wenzhou", "policy_date"] <- as.Date("2020-02-01")
+
+
+# -------------------------------- Plot -----------------------------------
+ggplot(data = line_2city, mapping = aes(x = date,y = per.confirm, group = index)) +
+  geom_line(aes(color = index), size = 1) +
+  geom_vline(aes(xintercept = policy_date), linetype = "dashed") +
+  scale_x_date(date_labels = "%m/%d", date_breaks = "3 days") +
+  theme_bw(base_family = "Times") +
+  theme(panel.grid.minor = element_blank(),
+        legend.position = "top",
+        panel.border = element_blank(),
+        text = element_text(size = 16),
+        strip.background = element_rect(color = "white"),
+        plot.title = element_text(hjust = 0.5)) +
+  scale_color_jco() +
+  facet_wrap(~ city, scales = "free_x") +
+  labs(x = "Date", y = "Postive individuals per 100,000", 
+       title = NULL,
+       color = "")
+ggsave("SCM_SH_WZ.pdf", width = 9, height = 4.5)
+
+
+
+ggplot(data = placebo_2city, mapping=aes(x = date,y = per.confirm, group = area))+
+  geom_line(aes(color = group, alpha = group, size = group)) +
+  scale_x_date(date_labels ="%m/%d",date_breaks = "3 days") +
+  theme_bw(base_family = "Times") +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid = element_blank(),
+        legend.position = "top",
+        panel.border = element_blank(),
+        strip.background = element_rect(color = "white"),
+        # text = element_text(family = "Times"),
+        text = element_text(size = 16),
+        plot.title = element_text(hjust = 0.5)) +
+  scale_colour_discrete(name  ="",
+                        breaks=c("Shanghai", "Control Regions"),
+                        labels=c("Shanghai", "Control Regions")) +
+  scale_size_discrete(name  ="",
+                      breaks=c("Shanghai", "Control Regions"),
+                      labels=c("Shanghai", "Control Regions")) +
+  scale_colour_manual(values = c(pal_jco()(7)[1], pal_jco()(7)[3]))+
+  scale_alpha_manual(values = c(1, 0.3), guide = FALSE)+
+  scale_size_manual(values = c(1, 0.5), guide = FALSE)+
+  facet_wrap(~ city, scales = "free_x") +
+  labs(x = "Date", y = "Gap in the postive individuals per 100,000", 
+       title = NULL,
+       color = "")
+
+ggsave("SCM_test_SH_WZ.pdf", width = 9, height = 4.5)
+
+save(line_2city, placebo_2city, file = "SCM_2city_plot.rda")
+
