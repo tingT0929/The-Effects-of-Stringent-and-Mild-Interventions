@@ -1,5 +1,6 @@
 library(Synth)     # version 1.1-5
 library(ggplot2)   # version 3.3.2
+library(ggsci)     # version 2.9
 library(dplyr)     # version 1.0.2
 library(reshape2)  # version 1.4.4
 library(tidyr)     # version 1.1.2
