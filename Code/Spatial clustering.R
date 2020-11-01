@@ -12,7 +12,7 @@ library(dplyr)
 ## Data
 setwd("./Data")
 dat <- read.csv("latdata1014.csv")
-dat <- dat[,-1]
+dat <- dat[, -1]
 city <- dat$ctname
 scity <- city[c(1, 2)]
 us <- read.csv("usedata1014.csv", header = T)[, -1]
