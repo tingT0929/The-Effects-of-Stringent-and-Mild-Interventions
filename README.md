@@ -15,5 +15,8 @@ The names of cities ("ctname"), the percentage of the popuatlion aged over 65 ("
 
 # Code
 ## Abstract
+We employed two classical casual effect models (synthetic control method) and (regression discontinuity) to identify the casual effects of interventions and to statistically measure the causual effects. After the causual effects of interventions were identified, we applied our proposed model (Susceptible-Infectious-self-Healing-Positive: SIHP) to simulate the stringent and the mild interventions delayed few days and the absence of both individual intervention and all interventions. The Bayesian framework and the technique of Markov Chain Monte Carlo (MCMC) used in the SIHR model to obtain estimates of parameters.
+
+## Description
 
 
