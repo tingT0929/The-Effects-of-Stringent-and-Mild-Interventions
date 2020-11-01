@@ -77,26 +77,28 @@ for(i in 1:2){
   sdf <- segment(df1)
   df1$labels$Group <- "B"
 
-  if(i==1){sdf=filter(sdf,x<=45);
-    ptree = ggplot(sdf) +
-    geom_segment(aes(x = x, y = y, xend = xend,yend = yend)) +
-    geom_text(data = df1$labels[1:45, ], aes(x = x, y = y - 0.001, label = label[1:45]),
-              angle = 90, hjust = 1, vjust = 0.3, size = 2.5 ) +
-    scale_y_continuous(expand = c(-0.01, 0.01)) +
-    scale_x_continuous(limits = c(0, 60)) +
-    theme_bw() + labs(x = "", y = "") +
-    geom_point(data = filter(df1$labels, label == scity[i]),
-               aes(x = x, y = y, color = Group,  shape = Group)) +
-    scale_color_brewer("", palette = "Set1") +
-    theme(legend.position = "none", panel.border = element_blank()) +
-    geom_hline(yintercept = 0.01, lty = 2, col = 2)+
-    geom_segment(data=data.frame(x = c(21.05, 55), y = c(0.015, 0.015), 
-                                 xend = c(55, 55), yend = c(0.015, 0.001)),
-                 aes(x = x, y = y, xend = xend, yend = yend)) +
-    geom_text(data = data.frame(x = 55, y = 0, lab = "......"), 
-              aes(x = x, y = y, label = lab), size = 10)
-     
-  ggsave(paste0("ptree", scity[i], ".pdf"), height = 6, width = 12)}####ÎÂÖÝ¾ÛÀàÍ¼
+  if(i == 1) {
+    sdf <- filter(sdf, x <= 45);
+    ptree <- ggplot(sdf) +
+      geom_segment(aes(x = x, y = y, xend = xend,yend = yend)) +
+      geom_text(data = df1$labels[1:45, ], aes(x = x, y = y - 0.001, label = label[1:45]),
+                angle = 90, hjust = 1, vjust = 0.3, size = 2.5 ) +
+      scale_y_continuous(expand = c(-0.01, 0.01)) +
+      scale_x_continuous(limits = c(0, 60)) +
+      theme_bw() + labs(x = "", y = "") +
+      geom_point(data = filter(df1$labels, label == scity[i]),
+                 aes(x = x, y = y, color = Group,  shape = Group)) +
+      scale_color_brewer("", palette = "Set1") +
+      theme(legend.position = "none", panel.border = element_blank()) +
+      geom_hline(yintercept = 0.01, lty = 2, col = 2)+
+      geom_segment(data=data.frame(x = c(21.05, 55), y = c(0.015, 0.015), 
+                                   xend = c(55, 55), yend = c(0.015, 0.001)),
+                   aes(x = x, y = y, xend = xend, yend = yend)) +
+      geom_text(data = data.frame(x = 55, y = 0, lab = "......"), 
+                aes(x = x, y = y, label = lab), size = 10)
+    
+  ggsave(paste0("ptree", scity[i], ".pdf"), height = 6, width = 12)
+  }
   
   a <- P5[i]
   cluster_mark <- (P5 == a)
