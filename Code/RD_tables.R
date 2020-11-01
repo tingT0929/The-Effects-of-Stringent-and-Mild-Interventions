@@ -13,7 +13,7 @@ setwd("./Data")
 # ------------------- Table 1 ----------------------
 
 region <- "Wenzhou"
-Y <- read.csv("wenzhou.csv")
+Y <- read.csv("wzdat1014.csv")
 Y <- Y[Y$ctname == region, ]
 wenzhou.rd <- Y[, c("fulldate", "confirmed")]
 wenzhou.rd$date <- as.numeric(as.Date(wenzhou.rd$fulldate)) - 18281 - 12
@@ -38,7 +38,7 @@ stargazer(fit_1, fit_2, fit_3, fit_4, fit_5, type = "html", style = "all", out =
 ############### Shanghai ###################
 
 region <- "Shanghai"
-Y <- read.csv("shanghai.csv")
+Y <- read.csv("shdat1014.csv")
 Y <- Y[Y$ctname == region, ]
 shanghai.rd <- Y[, c("fulldate", "confirmed")]
 shanghai.rd$date <- as.numeric(as.Date(shanghai.rd$fulldate)) - 18280 - 5
