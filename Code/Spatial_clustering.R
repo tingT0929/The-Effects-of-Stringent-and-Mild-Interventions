@@ -69,7 +69,6 @@ for(i in 1:2){
   plot(tree)
   P5 <- cutree(tree, cluster_size[i])
   
-  sum(P5 == 1)
   
 ############# Cluster Plot ###########
   df1 <- dendro_data(tree, type = "rectangle")
