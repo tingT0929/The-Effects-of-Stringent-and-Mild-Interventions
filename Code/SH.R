@@ -1,6 +1,6 @@
 ## Data
 setwd("./Data/")
-source("../Code/Modeling_function.R")
+source("../Code/Epidemic_model.R")
 region <- "Shanghai"
 Y <- read.csv("shdat1014.csv")
 Y <- Y[Y$ctname == region,]

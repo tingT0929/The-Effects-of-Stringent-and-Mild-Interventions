@@ -2,7 +2,7 @@ library(ggsci)
 
 ## Data
 setwd("./Data/")
-source("../Code/Modeling_function.R")
+source("../Code/Epidemic_model.R")
 
 re_scale <- function(x){
   A <- log(10) / 10
