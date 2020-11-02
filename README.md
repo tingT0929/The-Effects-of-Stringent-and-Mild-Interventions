@@ -14,7 +14,7 @@ Meanwhile, the daily positive individuals of COVID-19 for each infected county o
 The data to reproduce our results are available.
 
 ### 3) Data dictionary
-The data incorporte 2 `.csv` files.
+The data incorporte 4 `.csv` files.
 - The names of regions ("ctname"), the percentage of the popuatlion aged over 65 ("prop.elder"), population density size ("density"), latitude ("Latitude"), GDP per capita ("pergdp"), temperature ("Meantem2020"), daily positive individuals of COVID-19 (“comfirmed”), and the selected principal components ("pc1", "pc2","pc3") are included in the `wzdat1014.csv` file. 
 - Also, the same variables are included in the `shdat1014.csv` file. 
 - The names of regions ("ctname"), latitude ("Latitude"), population ("Population") and the trajectories of COVID-19 from the day 1 to day 29 are included in the `latdat1014.csv` file. 
