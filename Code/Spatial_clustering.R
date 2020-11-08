@@ -81,7 +81,7 @@ for(i in 1:2){
     ptree <- ggplot(sdf) +
       geom_segment(aes(x = x, y = y, xend = xend,yend = yend)) +
       geom_text(data = df1$labels[1:45, ], aes(x = x, y = y - 0.001, label = label[1:45]),
-                angle = 90, hjust = 1, vjust = 0.3, size = 2.5 ) +
+                angle = -90, hjust = 0, vjust = 0.3, size = 2.5 ) +
       scale_y_continuous(expand = c(-0.01, 0.01)) +
       scale_x_continuous(limits = c(0, 60)) +
       theme_bw() + labs(x = "", y = "") +
