@@ -100,12 +100,12 @@ index.placebo.shanghai <- ncol(placebo.shanghai)
 
 placebo.shanghai2 <- gather(placebo.shanghai, area, per.confirm)
 placebo.shanghai2$date <- rep(as.Date(c(18281:18296), origin = "1970-01-01"), index.placebo.shanghai)
-# Discards counties with MSE thousand times higher than Shanghai’s
+# Discards counties with MSE ten thousand times higher than Shanghai’s
 befpolicy <- placebo.shanghai2[placebo.shanghai2$date %in% as.Date(c(18281:18284), origin = "1970-01-01"), ]
 befpolicy <- spread(befpolicy[, 1:3], area, per.confirm)
 befpolicy
 mse.shanghai <- apply(befpolicy[, 2:(index.placebo.shanghai + 1)]^2, 2, mean) # Calculate MSE
-thstimes.shanghai <- names(mse.shanghai[mse.shanghai > mse.shanghai["X1"] * 1000]) # Get the corresponding index
+thstimes.shanghai <- names(mse.shanghai[mse.shanghai > mse.shanghai["X1"] * 10000]) # Get the corresponding index
 thstimes.shanghai
 placebo.shanghai2 <- placebo.shanghai2[!placebo.shanghai2$area %in% thstimes.shanghai, ]
 placebo.shanghai2$group <- factor(c(rep("shanghai",16), rep("Control Regions", 
