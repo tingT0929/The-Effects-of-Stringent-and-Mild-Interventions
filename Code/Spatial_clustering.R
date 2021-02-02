@@ -10,7 +10,7 @@ library(dplyr)
 
 # -----------------------------------------
 ## Data
-setwd("./Data")
+setwd("~/GitHub/The-Effects-of-Stringent-and-Mild-Interventions/Data/")
 dat <- read.csv("latdata1014.csv")
 dat <- dat[, -1]
 city <- dat$ctname

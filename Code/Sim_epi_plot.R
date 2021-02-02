@@ -1,7 +1,7 @@
 library(ggsci)
 
 ## Data
-setwd("./Data/")
+setwd("~/GitHub/The-Effects-of-Stringent-and-Mild-Interventions/Data/")
 source("../Code/Epidemic_model.R")
 
 re_scale <- function(x){

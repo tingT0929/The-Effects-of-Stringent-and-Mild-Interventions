@@ -7,7 +7,7 @@ library(rdrobust)  # version 0.99.5
 library(stargazer) # version 5.2.2
 library(ggsci)     # version 2.9.0
 
-setwd("./Data")
+setwd("~/GitHub/The-Effects-of-Stringent-and-Mild-Interventions/Data/")
 
 ############### Wenzhou ##################
 # ------------------- Table 1 ----------------------

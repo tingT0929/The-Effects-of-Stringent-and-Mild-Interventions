@@ -1,5 +1,5 @@
 ## Data
-setwd("./Data/")
+setwd("~/GitHub/The-Effects-of-Stringent-and-Mild-Interventions/Data/")
 source("../Code/Epidemic_model.R")
 region <- "Shanghai"
 Y <- read.csv("shdat1014.csv")

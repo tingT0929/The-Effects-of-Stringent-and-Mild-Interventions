@@ -2,7 +2,7 @@ library(coda)
 library(tidybayes)
 
 ## Data
-setwd("./Data/")
+setwd("~/GitHub/The-Effects-of-Stringent-and-Mild-Interventions/Data/")
 load("Wenzhou_para.rda")
 wz_para <- para
 load("Shanghai_para.rda")
