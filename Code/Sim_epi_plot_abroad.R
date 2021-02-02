@@ -5,11 +5,8 @@ library(ggsci)
 setwd("../Data/")
 source("../Code/Epidemic_model.R")
 
-re_scale <- function(x){
-  A <- log(10) / 10
-  a <-  (1 / A - 10) / 100
-  b <- (10 - 1 / (2 * A)) / 5
-  return((a * x ^ 2 + b * x) * (x < 10) + log(x + 10^ (-10)) * (x >= 10) / (log(10) / 10))
+f_sim <- function(k, alp) {
+  alp[4] * (alp[3] / (1 + exp(2 * log(99) / alp[2] * (k - alp[1] - alp[2] / 2))) + 1 - alp[3])
 }
 
 # ------------- Delay --------------
@@ -25,83 +22,66 @@ for (i in 1:2) {
     
   }
   
-  N <- 100000  ## The average population of the counties of the United States
+  N <-  6537101  ## The average population of the states of the United States
+  mark <- seq(1, length(para), 10)
   
-  ## Simulation
-  sim_path <- lapply(1:4000, function(i){
-    Y <- cbind(N - para[[i]][[2]] - para[[i]][[3]], para[[i]][[2]], para[[i]][[3]])
+  ## Simulation 1
+  sim_path <- lapply(mark, function(i){
+    Y <- cbind(N - para[[i]][[2]][1], para[[i]][[2]][1], 0, 0)
     
     a <- para[[i]][[1]]
-    b <- para[[i]][[5]]
-    for(j in policy_change_1:length(R)){
-      a[1] <- f_alp(j-3, b)
-      out <- as.numeric(ode(y = Y[j-1,], times = (j-1):j, eqn, parms = a, N = N)[2,-1])
-      Y[j,] <- out
+    intervention_start_date <- rtnorm(1, 16, 2, 0, Inf)
+    intervention_effect_date <- rtnorm(1, 20, 2, 0, Inf)
+    for(j in 2:100){
+      a[1] <- f_sim(j, c(intervention_start_date, intervention_effect_date, 0, para[[i]][[5]][2]))
+     
+      out <- as.numeric(ode(y = Y[j-1,-4], times = (j-1):j, eqn, parms = a, N = N)[2,-1])
+      Y <- rbind(Y, c(out, N - sum(out)))
     }
     
-    return(Y)
-  })
-  
-  delay_3 <- sapply(1:length(smooth_dat), function(i){
-    delay_3[[i]][,3]
-  })
-  
-  delay_3 <- sapply(1:length(R), function(i){
-    quantile(delay_3[i,], c(0.025, 0.5, 0.975))
-  })
-  
-  delay_5 <- lapply(mark, function(i){
-    Y <- cbind(N - para[[i]][[2]] - para[[i]][[3]], para[[i]][[2]], para[[i]][[3]])
-    
-    a <- para[[i]][[1]]
-    b <- para[[i]][[5]]
-    for(j in policy_change_1:length(R)){
-      a[1] <- f_alp(j-5, b)
-      out <- as.numeric(ode(y = as.numeric(Y[j-1,]), times = (j-1):j, eqn, parms = a, N = N)[2,-1])
-      Y[j,] <- out
+    Z <- Y
+    for(j in (floor(intervention_start_date)+1):100){
+      a[1] <- f_sim(j, c(intervention_start_date, intervention_effect_date, 
+                         (para[[i]][[5]][2] - para[[i]][[5]][3]) / para[[i]][[5]][2], para[[i]][[5]][2]))
+      
+      out <- as.numeric(ode(y = Z[j-1,-4], times = (j-1):j, eqn, parms = a, N = N)[2,-1])
+      Z[j,] <- c(out, N - sum(out))
     }
     
-    return(Y)
+    return(list(Y, Z))
   })
   
-  delay_5 <- sapply(1:length(smooth_dat), function(i){
-    delay_5[[i]][,3]
+  confirm <- sapply(1:length(mark), function(i){
+    sim_path[[i]][[1]][,3]
   })
   
-  delay_5 <- sapply(1:length(R), function(i){
-    quantile(delay_5[i,], c(0.025, 0.5, 0.975))
+  confirm <- sapply(1:100, function(i){
+    quantile(confirm[i,], c(0.025, 0.5, 0.975))
   })
   
+  confirm_1 <- sapply(1:length(mark), function(i){
+    sim_path[[i]][[2]][,3]
+  })
   
-  a <- 100000 / N
+  confirm_1 <- sapply(1:100, function(i){
+    quantile(confirm_1[i,], c(0.025, 0.5, 0.975))
+  })
   
-  if(i == 1){
-    x <- 2:(length(R) + 1)
-  }else{
-    x <- 1:length(R)
-  }
-  
-  dat_temp <- data.frame(x = x, confirm = re_scale(confirm[2,] * a), confirm_obs = re_scale(R * a), 
-                         confirm_min = re_scale(confirm[1,] * a), confirm_max = re_scale(confirm[3,] * a),
-                         delay3 = re_scale(delay_3[2,] * a), delay3_min = re_scale(delay_3[1,] * a), delay3_max = re_scale(delay_3[3,] * a),
-                         delay5 = re_scale(delay_5[2,] * a), delay5_min = re_scale(delay_5[1,] * a), delay5_max = re_scale(delay_5[3,] * a))
+  dat_temp <- data.frame(x = 1:100, confirm = confirm[2,], confirm_1 = confirm_1[2,], 
+                         confirm_min = confirm_1[1,], confirm_max = confirm_1[3,])
   
   dat_plot <- rbind(dat_plot, dat_temp)
 }
 
-dat_plot$city <- factor(rep(c("Wenzhou", "Shanghai"), each = length(R)), levels = c("Wenzhou", "Shanghai"))
+dat_plot$city <- factor(rep(c("Type 1", "Type 2"), each = 100), levels = c("Type 1", "Type 2"))
 
-ggplot(dat_plot) + 
-  geom_ribbon(aes(x = x, ymin = delay5_min, ymax = delay5_max), color = pal_jco()(7)[4], fill = pal_jco()(7)[4], alpha = 0.05, linetype = 3) +
-  geom_ribbon(aes(x = x, ymin = delay3_min, ymax = delay3_max), color = pal_jco()(7)[2], fill = pal_jco()(7)[2], alpha = 0.05, linetype = 3) +
-  # geom_ribbon(aes(x = x, ymin = confirm_min, ymax = confirm_max), color = '#636363', fill = '#636363', alpha = 1, linetype = 3) +
-  geom_line(aes(x = x, y = delay5, color = "Delay 5 days"), size = 1) +
-  geom_line(aes(x = x, y = delay3, color = "Delay 3 days"), size = 1) +
-  geom_line(aes(x = x, y = confirm, color = "Latent positive individuals"), size = 1) +
-  geom_point(aes(x = x, y = confirm_obs, color = "Observed positive individuals"), size = 1) +
-  scale_color_manual(breaks = c("Delay 3 days", "Delay 5 days", "Latent positive individuals", "Observed positive individuals"),
-                     values = c(pal_jco()(7)[2], pal_jco()(7)[4], 'gray', pal_jco()(7)[1])) +
-  scale_x_continuous(breaks = seq(2, length(R), 5), label = format(seq.Date(from = as.Date("2020-1-20"), by = "day", length.out = (length(R) + 1)), "%m/%d")[seq(2, length(R), 5)]) + 
+ggplot(dat_plot[c(1:35, 101:135),]) + 
+  geom_line(aes(x = x, y = confirm, color = "Simulated outbreak curve"), size = 1) +
+  geom_line(aes(x = x, y = confirm_1, color = "Under interventions"), size = 1) +
+  # geom_ribbon(aes(x = x, ymin = confirm_min, ymax = confirm_max), color = pal_jco()(7)[6], fill = pal_jco()(7)[6], alpha = 0.05, linetype = 3) +
+  scale_color_manual(breaks = c("Simulated outbreak curve", "Under interventions"),
+                     values = c(pal_jco()(7)[4], pal_jco()(7)[6])) +
+  scale_x_continuous(breaks = seq(1, 100, 7)) +
   # geom_vline(xintercept = policy_change_1, linetype = 2, size = 1, alpha = 0.8, color = "red") +
   theme_bw(base_family = "Times") +
   theme(panel.grid.minor = element_blank(),
@@ -112,8 +92,7 @@ ggplot(dat_plot) +
           color = "white"),
         # text = element_text(family = "STHeiti"),
         plot.title = element_text(hjust = 0.5)) +
-  labs(x = "Date", y = "Positive individuals per 100,000", 
-       # title = "The simulation of delay effect", 
+  labs(x = "Day", y = "Positive individuals", 
        colour = "", fill = "") + 
   guides(linetype = guide_legend(nrow = 1),
          color = guide_legend(nrow = 1, order = 1),
@@ -121,156 +100,7 @@ ggplot(dat_plot) +
          # shape = guide_legend(nrow = 1),
          size = guide_legend(nrow = 1),
          color = T) +
-  facet_wrap(~ city) +
-  scale_y_continuous(breaks = re_scale(c(0, 10, 10^2, 10^3, 10^4)), 
-                     label = c(0, 10, 10^2, 10^3, 10^4))
+  facet_wrap(~ city)
 
-ggsave("SH_WZ_Policy_delay.pdf", width = 10, height = 4.5)
-
-
-
-# ------------- Effectiveness -----------------
-dat_plot2 <- data.frame()
-for (i in 1:2) {
-  if (i == 1) {
-    load("Wenzhou_para.rda")
-    region <- "Wenzhou"
-    Y <- read.csv("wzdat1014.csv")
-    
-    policy_change_1 <- 3
-    policy_change_2 <- 12
-  } else {
-    load("Shanghai_para.rda")
-    region <- "Shanghai"
-    Y <- read.csv("shdat1014.csv")
-    
-    policy_change_1 <- 5
-    policy_change_2 <- 15
-  }
-  Y <- Y[Y$ctname == region,]
-  R <- Y$confirmed
-  
-  N <- Y$Population[1]
-  
-  ## Plot
-  mark <- seq(1, length(para), 10)
-  smooth_dat <- lapply(mark, function(i){
-    Y <- cbind(N - para[[i]][[2]] - para[[i]][[3]], para[[i]][[2]], para[[i]][[3]])
-    return(Y)
-  })
-  
-  confirm <- sapply(1:length(smooth_dat), function(i){
-    smooth_dat[[i]][,3]
-  })
-  
-  confirm <- sapply(1:length(R), function(i){
-    quantile(confirm[i,], c(0.025, 0.5, 0.975))
-  })
-  
-  sec_1 <- lapply(mark, function(i){
-    Y <- cbind(N - para[[i]][[2]] - para[[i]][[3]], para[[i]][[2]], para[[i]][[3]])
-    
-    a <- para[[i]][[1]]
-    b <- para[[i]][[5]]
-    b[3] <- b[2]
-    for(j in policy_change_2:length(R)){
-      a[1] <- f_alp(j-1, b)
-      out <- as.numeric(ode(y = as.numeric(Y[j-1,]), times = (j-1):j, eqn, parms = a, N = N)[2,-1])
-      Y[j,] <- out
-    }
-    
-    return(Y)
-  })
-  
-  sec_1 <- sapply(1:length(smooth_dat), function(i){
-    sec_1[[i]][,3]
-  })
-  
-  sec_1 <- sapply(1:length(R), function(i){
-    quantile(sec_1[i,], c(0.025, 0.5, 0.975))
-  })
-  
-  sec_2 <- lapply(mark, function(i){
-    Y <- cbind(N - para[[i]][[2]] - para[[i]][[3]], para[[i]][[2]], para[[i]][[3]])
-    
-    a <- para[[i]][[1]]
-    b <- para[[i]][[5]]
-    b[2] <- b[1]
-    b[3] <- b[1]
-    for(j in policy_change_1:length(R)){
-      a[1] <- f_alp(j-1, b)
-      out <- as.numeric(ode(y = as.numeric(Y[j-1,]), times = (j-1):j, eqn, parms = a, N = N)[2,-1])
-      Y[j,] <- out
-    }
-    
-    return(Y)
-  })
-  
-  sec_2 <- sapply(1:length(smooth_dat), function(i){
-    sec_2[[i]][,3]
-  })
-  
-  sec_2 <- sapply(1:length(R), function(i){
-    quantile(sec_2[i,], c(0.025, 0.5, 0.975))
-  })
-  
-  if(i == 1){
-    x <- 2:(length(R) + 1)
-  }else{
-    x <- 1:length(R)
-  }
-  a <- 100000 / N
-  
-  dat_temp2 <- data.frame(x = x, confirm = re_scale(confirm[2,] * a), confirm_obs = re_scale(R * a), 
-                          confirm_min = re_scale(confirm[1,] * a), confirm_max = re_scale(confirm[3,] * a),
-                          without_last = re_scale(sec_1[2,] * a), without_last_min = re_scale(sec_1[1,] * a), without_last_max = re_scale(sec_1[3,] * a),
-                          without_all = re_scale(sec_2[2,] * a), without_all_min = re_scale(sec_2[1,] * a), without_all_max = re_scale(sec_2[3,] * a))
-  
-  dat_plot2 <- rbind(dat_plot2, dat_temp2)
-}
-
-dat_plot2$city <- factor(rep(c("Wenzhou", "Shanghai"), each = length(R)), levels = c("Wenzhou", "Shanghai"))
-dat_plot2$policy_date <- 4
-dat_plot2$policy_date[dat_plot2$city == "Shanghai"] <- 5
-dat_plot2$policy_date_2 <- 13
-dat_plot2$policy_date_2[dat_plot2$city == "Shanghai"] <- 20
-
-ggplot(dat_plot2) + 
-  geom_ribbon(aes(x = x, ymin = without_all_min, ymax = without_all_max), color = pal_jco()(7)[4], fill = pal_jco()(7)[4], alpha = 0.05, linetype = 3) +
-  geom_ribbon(aes(x = x, ymin = without_last_min, ymax = without_last_max), color = pal_jco()(7)[2], fill = pal_jco()(7)[2], alpha = 0.05, linetype = 3) +
-  # geom_ribbon(aes(x = x, ymin = confirm_min, ymax = confirm_max), color = pal_jco()(7)[4], fill = pal_jco()(7)[4], linetype = 3) +
-  geom_line(aes(x = x, y = without_all, color = "Scenario 1"), size = 1) +
-  geom_line(aes(x = x, y = without_last, color = "Scenario 2"), size = 1) +
-  geom_line(aes(x = x, y = confirm, color = "Latent positive individuals"), size = 1) +
-  geom_point(aes(x = x, y = confirm_obs, color = "Observed positive individuals"), size = 1) +
-  geom_vline(aes(xintercept = policy_date), linetype = "dashed") +
-  geom_vline(aes(xintercept = policy_date_2), linetype = "dashed") +
-  scale_color_manual(values = pal_jco()(7)[c(1, 2, 4)]) +
-  # scale_color_jco() +
-  scale_x_continuous(breaks = seq(2, length(R), 5), 
-                     label = format(seq.Date(from = as.Date("2020-1-20"), by = "day", length.out = (length(R) + 1)), "%m/%d")[seq(2, length(R), 5)]) +
-  scale_color_manual(breaks = c("Scenario 1", "Scenario 2", "Latent positive individuals", "Observed positive individuals"),
-                     values = c(pal_jco()(7)[4], pal_jco()(7)[2], 'gray', pal_jco()(7)[1])) +
-  theme_bw(base_family = "Times") +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = "top",
-        panel.border = element_blank(),
-        text = element_text(size = 16),
-        strip.background = element_rect(
-          color = "white"),
-        plot.title = element_text(hjust = 0.5)) +
-  labs(x = "Date", y = "Positive individuals per 100,000", 
-       colour = "", fill = "") + 
-  guides(linetype = guide_legend(nrow = 1),
-         color = guide_legend(nrow = 1, order = 1),
-         fill = guide_legend(nrow = 1, order = 2),
-         size = guide_legend(nrow = 1),
-         color = T) + 
-  facet_wrap(~ city) +
-  scale_y_continuous(breaks = re_scale(c(0, 10, 100, 1000, 10000, 100000)), 
-                     label = c(0, 10, 100, 1000, 10000, "100000"), limits = re_scale(c(0, 100000)))
-
-ggsave("SH_WZ_Policy_effect.pdf", width = 10, height = 4.5)
-
-
+ggsave("sim_abroad.pdf", width = 10, height = 4.5)
 
