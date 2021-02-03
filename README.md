@@ -19,7 +19,7 @@ The data incorporte 4 `.csv` files and a `raw data` folder.
 - Also, the same variables are included in the `shdat1014.csv` file. 
 - The names of regions ("ctname"), latitude ("Latitude"), population ("Population") and the trajectories of COVID-19 from the day 1 to day 29 are included in the `latdat1014.csv` file. 
 - The names of regions ("ctname"), the percentage of the popuatlion aged over 65 ("prop.elder"), population density size ("density"), latitude ("Latitude"), GDP per capita ("pergdp"), temperature ("Meantem2020"), daily positive individuals of COVID-19 ("comfirmed") for all infected areas are included in the `usedat1014.csv` file. 
-- The `raw data` folder contains the weather of all counties in the US, crawled from the website: [WEATHER UNDERGROUND](https://www.wunderground.com/history).
+- The `raw data` folder contain: a) the weather of all counties in the US, crawled from the website: [WEATHER UNDERGROUND](https://www.wunderground.com/history). b) `counties_location.dbf` contains the longitude and latitude of all counties.
 
 The covariate information of the United States counties is available from [the United States Census Bureau (USCB)](https://www.census.gov/). The daily positive individuals and deaths of COVID-19 for each infected county of the United States from March 1, 2020, to March 31, 2020, are from Johns Hopkins University ([COVID-19 Dashboard](https://coronavirus.jhu.edu/map.html)). And the data related to COVID-19 of Wenzhou and Shanghai are collected from the official websites of the local health commission.
 
