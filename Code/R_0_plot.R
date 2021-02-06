@@ -1,5 +1,7 @@
 library(coda)
 library(tidybayes)
+library(ggplot2)
+library(ggsci)
 
 ## Data
 setwd("~/GitHub/The-Effects-of-Stringent-and-Mild-Interventions/Data/")

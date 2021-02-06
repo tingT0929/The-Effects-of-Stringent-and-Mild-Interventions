@@ -254,7 +254,7 @@ dat_plot2$city <- factor(rep(c("Wenzhou", "Shanghai"), each = length(R)), levels
 dat_plot2$policy_date <- 4
 dat_plot2$policy_date[dat_plot2$city == "Shanghai"] <- 5
 dat_plot2$policy_date_2 <- 13
-dat_plot2$policy_date_2[dat_plot2$city == "Shanghai"] <- 20
+dat_plot2$policy_date_2[dat_plot2$city == "Shanghai"] <- 15
 
 ggplot(dat_plot2) + 
   geom_ribbon(aes(x = x, ymin = without_all_min, ymax = without_all_max), color = pal_jco()(7)[4], fill = pal_jco()(7)[4], alpha = 0.05, linetype = 3) +

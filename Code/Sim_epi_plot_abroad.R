@@ -10,6 +10,7 @@ f_sim <- function(k, alp) {
 }
 
 # ------------- Delay --------------
+set.seed(1234)
 dat_plot <- data.frame()
 for (i in 1:2) {
   if (i == 1) {
@@ -76,10 +77,10 @@ for (i in 1:2) {
 dat_plot$city <- factor(rep(c("Type 1", "Type 2"), each = 100), levels = c("Type 1", "Type 2"))
 
 ggplot(dat_plot[c(1:35, 101:135),]) + 
-  geom_line(aes(x = x, y = confirm, color = "Simulated outbreak curve"), size = 1) +
+  geom_line(aes(x = x, y = confirm, color = "Without interventions"), size = 1) +
   geom_line(aes(x = x, y = confirm_1, color = "Under interventions"), size = 1) +
   # geom_ribbon(aes(x = x, ymin = confirm_min, ymax = confirm_max), color = pal_jco()(7)[6], fill = pal_jco()(7)[6], alpha = 0.05, linetype = 3) +
-  scale_color_manual(breaks = c("Simulated outbreak curve", "Under interventions"),
+  scale_color_manual(breaks = c("Without interventions", "Under interventions"),
                      values = c(pal_jco()(7)[4], pal_jco()(7)[6])) +
   scale_x_continuous(breaks = seq(1, 100, 7)) +
   # geom_vline(xintercept = policy_change_1, linetype = 2, size = 1, alpha = 0.8, color = "red") +
