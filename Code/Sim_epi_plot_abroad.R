@@ -10,7 +10,6 @@ f_sim <- function(k, alp) {
 }
 
 # ------------- Delay --------------
-set.seed(1234)
 dat_plot <- data.frame()
 for (i in 1:2) {
   if (i == 1) {
@@ -31,8 +30,8 @@ for (i in 1:2) {
     Y <- cbind(N - para[[i]][[2]][1], para[[i]][[2]][1], 0, 0)
     
     a <- para[[i]][[1]]
-    intervention_start_date <- rtnorm(1, 16, 2, 0, Inf)
-    intervention_effect_date <- rtnorm(1, 20, 2, 0, Inf)
+    intervention_start_date <- 16
+    intervention_effect_date <- 20
     for(j in 2:100){
       a[1] <- f_sim(j, c(intervention_start_date, intervention_effect_date, 0, para[[i]][[5]][2]))
      
@@ -68,19 +67,26 @@ for (i in 1:2) {
     quantile(confirm_1[i,], c(0.025, 0.5, 0.975))
   })
   
-  dat_temp <- data.frame(x = 1:100, confirm = confirm[2,], confirm_1 = confirm_1[2,], 
-                         confirm_min = confirm_1[1,], confirm_max = confirm_1[3,])
+  dat_temp <- data.frame(x = 1:100, 
+                         confirm = confirm[2,], 
+                         confirm_min = confirm[1,], confirm_max = confirm[3,],
+                         confirm_1 = confirm_1[2,], 
+                         confirm_min_1 = confirm_1[1,], confirm_max_1 = confirm_1[3,])
   
   dat_plot <- rbind(dat_plot, dat_temp)
 }
 
 dat_plot$city <- factor(rep(c("Type 1", "Type 2"), each = 100), levels = c("Type 1", "Type 2"))
 
-ggplot(dat_plot[c(1:35, 101:135),]) + 
-  geom_line(aes(x = x, y = confirm, color = "Without interventions"), size = 1) +
+dat_plot_null <- dat_plot
+dat_plot$confirm_min_1[c(1:16, 101:116)] <- NA
+dat_plot$confirm_max_1[c(1:16, 101:116)] <- NA
+ggplot(dat_plot[c(1:40, 101:140),]) + 
   geom_line(aes(x = x, y = confirm_1, color = "Under interventions"), size = 1) +
-  # geom_ribbon(aes(x = x, ymin = confirm_min, ymax = confirm_max), color = pal_jco()(7)[6], fill = pal_jco()(7)[6], alpha = 0.05, linetype = 3) +
-  scale_color_manual(breaks = c("Without interventions", "Under interventions"),
+  geom_line(aes(x = x, y = confirm, color = "Simulated outbreak curve"), size = 1) +
+  # geom_ribbon(aes(x = x, ymin = confirm_min, ymax = confirm_max), color = pal_jco()(7)[4], fill = pal_jco()(7)[4], alpha = 0.05, linetype = 3) +
+  # geom_ribbon(aes(x = x, ymin = confirm_min_1, ymax = confirm_max_1), color = pal_jco()(7)[6], fill = pal_jco()(7)[6], alpha = 0.05, linetype = 3) +
+  scale_color_manual(breaks = c("Simulated outbreak curve", "Under interventions"),
                      values = c(pal_jco()(7)[4], pal_jco()(7)[6])) +
   scale_x_continuous(breaks = seq(1, 100, 7)) +
   # geom_vline(xintercept = policy_change_1, linetype = 2, size = 1, alpha = 0.8, color = "red") +
