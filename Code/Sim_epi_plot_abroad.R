@@ -82,6 +82,8 @@ dat_plot_null <- dat_plot
 dat_plot$confirm_min_1[c(1:16, 101:116)] <- NA
 dat_plot$confirm_max_1[c(1:16, 101:116)] <- NA
 ggplot(dat_plot[c(1:40, 101:140),]) + 
+  geom_vline(aes(xintercept = 16), linetype = "dashed") +
+  geom_vline(aes(xintercept = 36), linetype = "dashed") +
   geom_line(aes(x = x, y = confirm_1, color = "Under interventions"), size = 1) +
   geom_line(aes(x = x, y = confirm, color = "Simulated outbreak curve"), size = 1) +
   # geom_ribbon(aes(x = x, ymin = confirm_min, ymax = confirm_max), color = pal_jco()(7)[4], fill = pal_jco()(7)[4], alpha = 0.05, linetype = 3) +
