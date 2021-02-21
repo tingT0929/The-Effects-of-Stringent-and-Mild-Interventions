@@ -10,7 +10,7 @@ library(ggsci)     # version 2.9.0
 setwd("~/GitHub/The-Effects-of-Stringent-and-Mild-Interventions/Data/")
 
 ############### Wenzhou ##################
-# ------------------- Table 1 ----------------------
+# ------------------- Table D.3 for wenzhou ----------------------
 
 region <- "Wenzhou"
 Y <- read.csv("wzdat1014.csv")
@@ -29,13 +29,14 @@ fit_5 <- lm(log(ctcomfirm) ~ (date + I(date^2)) * treatment, data = wenzhou.rd) 
 wz_aic <- AIC(fit_1, fit_2, fit_3, fit_4, fit_5)
 wz_bic <- BIC(fit_1, fit_2, fit_3, fit_4, fit_5)
 
-#### ------------------- Table 2 ----------------------
+#### ------------------- Table 2 for wenzhou ----------------------
 stargazer(fit_1, fit_2, fit_3, fit_4, fit_5, type = "html", style = "all", out = "regression_wenzhou.html")
 
 
 
 
 ############### Shanghai ###################
+# ------------------- Table D.3 for shanghai ----------------------
 
 region <- "Shanghai"
 Y <- read.csv("shdat1014.csv")
@@ -57,6 +58,6 @@ sh_bic <- BIC(fit_1, fit_2, fit_3, fit_4, fit_5)
 dat_result <- data.frame(wz_AIC = wz_aic[, 2], wz_BIC = wz_bic[, 2], sh_AIC = sh_aic[, 2], sh_BIC = sh_bic[, 2])
 write.csv(dat_result, file = "AIC_BIC.csv")
 
-#### ------------------- Table 2 ----------------------
+#### ------------------- Table 2 for shanghai ----------------------
 stargazer(fit_1, fit_2, fit_3, fit_4, fit_5, type = "html", style = "all", out = "regression_shanghai.html")
 
