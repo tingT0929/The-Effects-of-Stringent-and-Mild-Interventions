@@ -1,4 +1,4 @@
-#### ------------------- Figure D.3 ----------------------
+#### ------------------- Figure D.1 ----------------------
 
 RDplott_wz <- rdplot(log(wenzhou.rd$ctcomfirm), wenzhou.rd$date, c = 0, p = 2, binselect = "esmv", 
     kernel = "uniform", x.label = "date", y.label = "Cumulative confirmed cases")
